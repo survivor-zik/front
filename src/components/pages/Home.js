@@ -8,10 +8,10 @@ function Home() {
     async function getsurvivor() {
       try {
         const res = await axios.get('/userdetails/survivor/');
-        console.log(res.data); // Logging the API response data
-        setStudent(res.data); // Update the state with API response data
+        console.log(res.data);
+        setStudent(res.data); 
       } catch (error) {
-        console.error('Error fetching survivor data:', error);
+        console.error('Error fetching survivor data:',error);
         setStudent(null); // Set student data to null in case of an error
       }
     }

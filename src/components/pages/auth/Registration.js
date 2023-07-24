@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
 import { TextField,Button,Box,Alert } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const Registration = () => {
+
     const[error, setError]=useState({
         status:false,
         msg:"",
         type:""
       })
       const navigate= useNavigate();
-      const handleSubmit=(e)=>{
+      const handleSubmit = async(e)=>{
         e.preventDefault();
         const data = new FormData(e.currentTarget);
         const actualData={
@@ -22,9 +24,26 @@ const Registration = () => {
         }
         if (actualData.username && actualData.password && actualData.email && actualData.confirm_password && (actualData.password.length)>=8 && actualData.password === actualData.confirm_password){
           console.log(actualData);
-          setError({status:true, msg:"Registration Successful", type:'success'})
-          document.getElementById('registration-form').reset()
-            navigate('/welcome')
+          try{
+            const response = await axios.post('/usereg/',actualData);
+
+            document.getElementById('registration-form').reset()  
+          if (response.status === 201) {
+            setError({ status: true, msg: 'Registration Successful', type: 'success' });
+            
+            setTimeout(() => {navigate('/welcome')}, 4000);
+            
+          }else if (response.status == 400) {
+            // console.log(response,"proper")
+            setError({ status: true, msg: 'User or Email already exist' , type: 'error' });
+          }else{
+            setError({ status: true, msg: 'Registration Unsuccessful due to invalid credentials', type: 'error' });
+          }
+        }catch(error){
+          // console.log(response)
+            setError({ status: true, msg:'Invalid username or email', type: 'error' });
+          }
+
         }else if( (actualData.password.length)>0 && (actualData.password.length)<8){
           setError({status:true, msg:"Password Length Should be greater than 8", type:'error'})
 
