@@ -33,7 +33,7 @@ const Registration = () => {
             
             setTimeout(() => {navigate('/welcome')}, 4000);
             
-          }else if (response.status == 400) {
+          }else if (response.status === 400) {
             // console.log(response,"proper")
             setError({ status: true, msg: 'User or Email already exist' , type: 'error' });
           }else{

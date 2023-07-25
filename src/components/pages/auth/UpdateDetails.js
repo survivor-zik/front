@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Alert } from "@mui/material";
+import axios from "axios";
 const UpdateDetails = () => {
   const [error, setError] = useState({ status: false, msg: "", type: "" });
   const [pFiled, setPfield] = useState(true);
@@ -8,39 +9,80 @@ const UpdateDetails = () => {
   const [ageFiled, setAgefield] = useState(true);
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log('Ramis')
     const data = new FormData(event.currentTarget);
     const actualData = {};
-    
-    // data.get("username")?actualData .username=data.get("username") :""
-    // data.get("password")?actualData .password=data.get("password") :""
-    // data.get("email")?actualData .email=data.get("email"): ""
-    // data.get("name")?actualData .name=data.get("name") :""
-    // data.get("age")?actualData .name=data.get("age") :""
 
-    // const notNullProperties = Object.keys(actualData).filter(
-    //   (key) => actualData[key] === null
-    // );
-
-    // console.log("Properties null:", notNullProperties);
-    if (
-      data.get("username") && !pFiled
-        ? data.get("password")
-        : true && !emailFiled
-        ? data.get("email")
-        : true && !neNameFiled
-        ? data.get("name")
-        : true && ageFiled
-        ? data.get("age")
-        : true
-    ) {
-          console.log('work') 
-      
-    } else {
-      console.log("Field are required");
+    // Extract the username separately as it is always necessary
+    const username = data.get("username");
+    if (!username) {
+      setError({
+        status: true,
+        msg: "Username is required.",
+        type: "error",
+      });
+      return;
     }
+
+    // Check if password is enabled and not empty, then add to actualData
+    if (!pFiled) {
+      const password = data.get("password");
+      if (password) {
+        actualData.password = password;
+      }
+    }
+
+    // Check if email is enabled and not empty, then add to actualData
+    if (!emailFiled) {
+      const email = data.get("email");
+      if (email) {
+        actualData.email = email;
+      }
+    }
+
+    // Check if name is enabled and not empty, then add to actualData
+    if (!neNameFiled) {
+      const name = data.get("name");
+      if (name) {
+        actualData.name = name;
+      }
+    }
+
+    // Check if age is enabled and not empty, then add to actualData
+    if (!ageFiled) {
+      const age = data.get("age");
+      if (age) {
+        actualData.age = age;
+      }
+    }
+
+
+    // Send the actualData to the backend using Axios PUT request
+    axios
+      .put("/userdetails/" + username + "/", actualData)
+      .then((response) => {
+        if (response.data.status) {
+          setError({
+            status: true,
+            msg: response.data.message,
+            type: "error",
+          });
+        } else {
+          setError({
+            status: true,
+            msg: response.data.message,
+            type: "success",
+          });
+        }
+      })
+      .catch((error) => {
+        // Handle the error here if needed
+        setError({
+          status: true,
+          msg: "Issues in format of Email or Username",
+          type: "error",
+        });
+      });
   };
-  const UpdateData = () => {};
 
   return (
     <>
@@ -53,7 +95,10 @@ const UpdateDetails = () => {
           mx: 4,
         }}
       >
-        <h4>Update Details (Enter details you want to update)</h4>
+        <h4>
+          Update Details username is mandatory (Enter details you want to
+          update)
+        </h4>
         <Box
           component="form"
           onSubmit={handleSubmit}
